@@ -1,7 +1,7 @@
 import boto3
 import json
 import logging
-import custom_encoder from CustomEncoder
+from custom_encoder import CustomEncoder
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -22,10 +22,10 @@ def lambda_handler(event, context):
   logger.info(event)
   httpMethod = event['httpdMethod']
   path = event['path']
-  if httpdMethod == getMethod and path == healthPath : 
-    response = buildResponse(200)
+  if httpMethod == getMethod and path == healthPath : 
+    response = buildresponse(200)
     
-def buildresponse(statusCode, body=Nome) :
+def buildresponse(statusCode, body=None) :
   response = {
     'statusCode': statusCode,
     'headers': {
