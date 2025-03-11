@@ -19,8 +19,9 @@ carPath = '/car'
 carsPath = '/cars'
 
 def lambda_handler(event, context):
-  logger.info(event)
-  httpMethod = event['httpdMethod']
+  logger.info(json.dumps(event))
+  
+  httpMethod = event['httpMethod']
   path = event['path']
   if httpMethod == getMethod and path == healthPath : 
     response = buildresponse(200)
@@ -34,7 +35,7 @@ def lambda_handler(event, context):
     requestBody = json.loads(event['body'])
     response = modifyCar(requestBody['carId'], requestBody['updateKey'], requestBody['updateValue'])
   elif httpMethod == deleteMethod and path == carPath :
-    requestBody == json.loads(event['body'])
+    requestBody = json.loads(event['body'])
     response = deleteCar(requestBody['carId'])
   else :
     response = buildresponse(404, {'message': 'Not Found'})
@@ -58,14 +59,14 @@ def getCar(carId) :
 def getCars() : 
   try :
     response = table.scan()
-    result = response['Item']
+    result = response['Items']
     
     while 'lastEvaluatedKey' in response :
       response = table.sacan(ExclusiveStartKey=response['lastEvaluatedKey'])
-      result.extend(response['Item'])
+      result.extend(response['Items'])
       
     body = {
-      'cars': response
+      'cars': result
     }
     return buildresponse(200, body)
   except :
@@ -79,6 +80,7 @@ def saveCar(requestBody) :
       'Message': 'SUCCESS' ,
       'Item': requestBody
     }
+    return buildresponse(200, body)
   except :
     logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
     
@@ -88,7 +90,7 @@ def modifyCar(carId, updateKey, updateValue) :
       Key={
         'carId': carId
       },
-      UpdateExpression='set %s = :val' % updateKey,
+      UpdateExpression='set %s = :value' % updateKey,
       ExpressionAttributeValues={
         ':value': updateValue
       },
@@ -120,14 +122,13 @@ def deleteCar(carId) :
   except :
     logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
     
-def buildresponse(statusCode, body=None) :
-  response = {
-    'statusCode': statusCode,
-    'headers': {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
+def buildresponse(statusCode, body=None):
+    response = {
+        'statusCode': statusCode,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps(body) if body is not None else json.dumps({"message": "No content"})
     }
-  }
-  if body is not None :
-    response['body'] = json.dumps(body, cls=CustomEncoder)
-  return response
+    return response
