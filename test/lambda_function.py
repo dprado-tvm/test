@@ -12,7 +12,7 @@ table = dynamodb.Table(dynamodbTableName)
 
 getMethod = 'GET'
 postMehod = 'POST'
-patchMethod = 'PATCH'
+putMethod = 'PUT'
 deleteMethod = 'DELETE'
 healthPath = '/health'
 carPath = '/car'
@@ -31,7 +31,7 @@ def lambda_handler(event, context):
     response = getCars()
   elif httpMethod == postMehod and path == carPath :
     response = saveCar(json.loads(event['body']))
-  elif httpMethod == patchMethod and path == carPath :
+  elif httpMethod == putMethod and path == carPath :
     requestBody = json.loads(event['body'])
     response = modifyCar(requestBody['carId'], requestBody['updateKey'], requestBody['updateValue'])
   elif httpMethod == deleteMethod and path == carPath :
