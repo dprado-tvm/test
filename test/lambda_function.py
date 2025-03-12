@@ -3,6 +3,7 @@ import json
 import logging
 import uuid
 from custom_encoder import CustomEncoder
+from decimal import Decimal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -82,6 +83,17 @@ def getCars() :
 def saveCar(requestBody) :
   try :
     requestBody['carId'] = str(uuid.uuid4())
+    
+    if not isinstance(requestBody.get("car"), str):
+      return buildresponse(400, {'message': 'Car should be a String.'})
+    if not isinstance(requestBody.get("bran"), str):
+      return buildresponse(400, {'message': 'Bran should be a String'})
+    if not isinstance(requestBody.get("serial"), int):
+      return buildresponse(400, {'message': 'Serial should be an integer'})
+    if not isinstance(requestBody.get("price"), float):
+      return buildresponse(400, {'message': 'Price should be a Double'})
+    
+    requestBody['price'] = Decimal(str(requestBody['price']))
     table.put_item(Item=requestBody)
     body = {
       'Operation': 'SAVE',
@@ -155,6 +167,6 @@ def buildresponse(statusCode, body=None):
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps(body) if body is not None else json.dumps({"message": "No content"})
+        'body': json.dumps(body, default=str) if body is not None else json.dumps({"message": "No content"})
     }
     return response
