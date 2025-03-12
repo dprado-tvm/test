@@ -57,8 +57,9 @@ def getCar(carId) :
       return buildresponse(200, response['Item'])
     else :
       return buildresponse(404, {'message': 'Car not found' % carId})
-  except :
-    logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
+  except Exception as e:  
+    logger.exception('Unexpected error getting a car: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
     
 def getCars() : 
   try :
@@ -73,8 +74,9 @@ def getCars() :
       'cars': result
     }
     return buildresponse(200, body)
-  except :
-    logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
+  except Exception as e:  
+    logger.exception('Unexpected error getting cars: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
     
 def saveCar(requestBody) :
   try :
@@ -85,8 +87,9 @@ def saveCar(requestBody) :
       'Item': requestBody
     }
     return buildresponse(200, body)
-  except :
-    logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
+  except Exception as e:  
+    logger.exception('Unexpected error saving car: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
     
 def replaceCar(carId, newCarData):
   try:
@@ -99,8 +102,9 @@ def replaceCar(carId, newCarData):
     }
     return buildresponse(200, body)
 
-  except:
-    logger.exception('Error to replace the car')
+  except Exception as e:  
+    logger.exception('Unexpected error replacing car: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
 
 def modifyCar(carId, updateKey, updateValue) :
   try :
@@ -120,8 +124,9 @@ def modifyCar(carId, updateKey, updateValue) :
       'UpdatedAttributes': response
     }
     return buildresponse(200, body)
-  except :  
-    logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
+  except Exception as e:  
+    logger.exception('Unexpected error modifying a car: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
     
 def deleteCar(carId) :
   try :
@@ -137,8 +142,9 @@ def deleteCar(carId) :
       'Item': response
     }
     return buildresponse(200, body)
-  except :
-    logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
+  except Exception as e:  
+    logger.exception('Unexpected error deleting a car: %s', str(e))
+    return buildresponse(500, {'message': 'Internal Server Error'})
     
 def buildresponse(statusCode, body=None):
     response = {
