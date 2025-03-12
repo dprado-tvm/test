@@ -1,6 +1,7 @@
 import boto3
 import json
 import logging
+import uuid
 from custom_encoder import CustomEncoder
 
 logger = logging.getLogger()
@@ -80,13 +81,14 @@ def getCars() :
     
 def saveCar(requestBody) :
   try :
+    requestBody['carId'] = str(uuid.uuid4())
     table.put_item(Item=requestBody)
     body = {
       'Operation': 'SAVE',
       'Message': 'SUCCESS' ,
       'Item': requestBody
     }
-    return buildresponse(200, body)
+    return buildresponse(200, {'message': "Car created", "body": body})
   except Exception as e:  
     logger.exception('Unexpected error saving car: %s', str(e))
     return buildresponse(500, {'message': 'Internal Server Error'})
