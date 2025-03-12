@@ -33,7 +33,8 @@ def lambda_handler(event, context):
   elif httpMethod == postMethod and path == carPath :
     response = saveCar(json.loads(event['body']))
   elif httpMethod == putMethod and path == carPath :
-    response = replaceCar(json.loads(event['body']))
+    requestBody = json.loads(event['body'])
+    response = replaceCar(requestBody['carId'], requestBody)
   elif httpMethod == patchMethod and path == carPath :
     requestBody = json.loads(event['body'])
     response = modifyCar(requestBody['carId'], requestBody['updateKey'], requestBody['updateValue'])
