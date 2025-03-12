@@ -11,7 +11,8 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(dynamodbTableName)
 
 getMethod = 'GET'
-postMehod = 'POST'
+postMethod = 'POST'
+patchMethod = 'PATCH'
 putMethod = 'PUT'
 deleteMethod = 'DELETE'
 healthPath = '/health'
@@ -29,9 +30,11 @@ def lambda_handler(event, context):
     response = getCar(event['queryStringParameters']['carId'])
   elif httpMethod == getMethod and path == carsPath :
     response = getCars()
-  elif httpMethod == postMehod and path == carPath :
+  elif httpMethod == postMethod and path == carPath :
     response = saveCar(json.loads(event['body']))
   elif httpMethod == putMethod and path == carPath :
+    response = replaceCar(json.loads(event['body']))
+  elif httpMethod == patchMethod and path == carPath :
     requestBody = json.loads(event['body'])
     response = modifyCar(requestBody['carId'], requestBody['updateKey'], requestBody['updateValue'])
   elif httpMethod == deleteMethod and path == carPath :
@@ -84,6 +87,20 @@ def saveCar(requestBody) :
   except :
     logger.exception('Do your custom error handling here. I am just gonna log it out here!!')
     
+def replaceCar(carId, newCarData):
+  try:
+    newCarData['carId'] = carId
+    response = table.put_item(Item=newCarData)
+    body = {
+        'Operation': 'REPLACE',
+        'Message': 'SUCCESS',
+        'NewCarData': newCarData
+    }
+    return buildresponse(200, body)
+
+  except:
+    logger.exception('Error to replace the car')
+
 def modifyCar(carId, updateKey, updateValue) :
   try :
     response = table.update_item(
